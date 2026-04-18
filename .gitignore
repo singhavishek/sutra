@@ -205,3 +205,52 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# uv
+.venv/
+uv.lock
+
+# Local model cache (if present in repo for some reason)
+models/
+
+# Local test artifacts
+.sutra-test/
+scratch/
+tmp/
+*.local.*
+
+# Sutra project markers (these live inside registered projects, not this repo;
+# but just in case someone registers this repo itself, keep it out of git)
+.sutra/
+.sutraignore
+
+# Claude Code local state — kept entirely out of repo
+.claude/
+CLAUDE.md
+.mcp.json
+
+# Local architecture / design docs — kept out of repo for now
+docs/
+
+# FalkorDB / LanceDB local data (if anyone runs sutra in-place)
+graph.rdb
+appendonly.aof
+*.lance/
+
+# code-review-graph (used during sutra development; personal machine state)
+.code-review-graph/
+
+# Serena (LSP cache)
+.serena/
