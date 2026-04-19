@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from sutra.core.paths import SutraPaths
+    from sutra.core.settings import SutraSettings
 
 SUTRA_SERVER_NAME = "sutra"
 DEFAULT_COMMAND = "sutra"
@@ -27,21 +27,21 @@ DEFAULT_ARGS: tuple[str, ...] = ("serve-mcp",)
 _CONFIG_MODE = 0o600
 
 
-def is_registered(paths: SutraPaths) -> bool:
+def is_registered(settings: SutraSettings) -> bool:
     """Return True if sutra is registered at the user scope."""
-    config = _load(paths.claude_mcp_config_path)
+    config = _load(settings.paths.claude_mcp_config_path)
     servers = config.get("mcpServers", {})
     return isinstance(servers, dict) and SUTRA_SERVER_NAME in servers
 
 
 def register(
-    paths: SutraPaths,
+    settings: SutraSettings,
     *,
     command: str = DEFAULT_COMMAND,
     args: tuple[str, ...] | list[str] = DEFAULT_ARGS,
 ) -> None:
     """Add or update the sutra entry. Preserve other keys and servers."""
-    path = paths.claude_mcp_config_path
+    path = settings.paths.claude_mcp_config_path
     config = _load(path)
     servers = config.setdefault("mcpServers", {})
     if not isinstance(servers, dict):
@@ -51,9 +51,9 @@ def register(
     _atomic_write(path, config)
 
 
-def unregister(paths: SutraPaths) -> bool:
+def unregister(settings: SutraSettings) -> bool:
     """Remove the sutra entry. Return True if it was present."""
-    path = paths.claude_mcp_config_path
+    path = settings.paths.claude_mcp_config_path
     if not path.exists():
         return False
     config = _load(path)

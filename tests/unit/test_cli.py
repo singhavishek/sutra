@@ -8,6 +8,7 @@ from typer.testing import CliRunner
 
 from sutra import __version__
 from sutra.cli import app
+from sutra.core import launchd as launchd_module
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -38,11 +39,13 @@ def test_bare_invocation_shows_help() -> None:
 def test_init_runs_end_to_end_and_reports_success(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("SUTRA_CONFIG_HOME", str(tmp_path / "cfg"))
-    monkeypatch.setenv("SUTRA_DATA_HOME", str(tmp_path / "data"))
-    monkeypatch.setenv("SUTRA_LOG_HOME", str(tmp_path / "logs"))
-    monkeypatch.setenv("SUTRA_LAUNCH_AGENTS_DIR", str(tmp_path / "launchagents"))
-    monkeypatch.setenv("SUTRA_CLAUDE_MCP_CONFIG_PATH", str(tmp_path / ".claude.json"))
+    monkeypatch.setattr(launchd_module.sys, "platform", "linux")
+    monkeypatch.setenv("SUTRA_PATHS__CONFIG_HOME", str(tmp_path / "cfg"))
+    monkeypatch.setenv("SUTRA_PATHS__DATA_HOME", str(tmp_path / "data"))
+    monkeypatch.setenv("SUTRA_PATHS__LOG_HOME", str(tmp_path / "logs"))
+    monkeypatch.setenv("SUTRA_PATHS__LAUNCH_AGENTS_DIR", str(tmp_path / "launchagents"))
+    monkeypatch.setenv("SUTRA_PATHS__CLAUDE_MCP_CONFIG_PATH", str(tmp_path / ".claude.json"))
+    monkeypatch.setenv("SUTRA_CONFIG_TOML", str(tmp_path / "missing.toml"))
 
     result = runner.invoke(app, ["init"])
 
@@ -50,3 +53,12 @@ def test_init_runs_end_to_end_and_reports_success(
     assert "sutra initialized" in result.stdout
     assert (tmp_path / ".claude.json").exists()
     assert (tmp_path / "launchagents" / "ai.sutra.falkordb.plist").exists()
+
+
+def test_falkordb_serve_reports_setup_error_with_nonzero_exit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SUTRA_FALKORDB__REDIS_SERVER_BINARY", "/does/not/exist/redis-server")
+    result = runner.invoke(app, ["falkordb-serve"])
+    assert result.exit_code == 1
+    assert "redis-server not found" in result.stdout

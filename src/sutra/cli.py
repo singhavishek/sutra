@@ -17,6 +17,9 @@ from rich.markup import escape
 
 from sutra import __version__
 from sutra.cli_commands.init import run as _run_init
+from sutra.cli_commands.serve import FalkorDBSetupError
+from sutra.cli_commands.serve import run as _run_serve
+from sutra.core.settings import SutraSettings
 
 app = typer.Typer(
     name="sutra",
@@ -47,11 +50,28 @@ def init() -> None:
         console.print(f"[dim]\u2022[/] Exists  {escape(str(directory))}")
     verb = "Wrote" if result.plist_was_new else "Updated"
     console.print(f"[green]\u2713[/] {verb} launchd plist {escape(str(result.plist_path))}")
+    if result.launchd_skipped:
+        console.print("[dim]\u2022[/] launchctl load skipped (non-Darwin)")
+    else:
+        console.print(f"[green]\u2713[/] launchctl {result.launchd_action}")
     if result.mcp_was_already_registered:
         console.print("[dim]\u2022[/] Claude Code MCP already registered")
     else:
         console.print("[green]\u2713[/] Registered sutra with Claude Code MCP")
+    console.print(
+        f"[green]\u2713[/] Wrote config example {escape(str(result.config_example_path))}"
+    )
     console.print("\n[bold]sutra initialized.[/]")
+
+
+@app.command(name="falkordb-serve")
+def falkordb_serve() -> None:
+    """Exec FalkorDB in the foreground (launchd-supervised in production)."""
+    try:
+        _run_serve(SutraSettings())
+    except FalkorDBSetupError as exc:
+        console.print(f"[red]\u2717[/] {escape(str(exc))}")
+        raise typer.Exit(1) from exc
 
 
 @app.command()

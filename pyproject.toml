@@ -54,7 +54,7 @@ dependencies = [
     "mcp>=1.0.0",
     # Async + IO
     "anyio>=4.4.0",
-    "watchfiles>=0.22.0",  # file watcher (optional in Phase 0, used Phase 2+)
+    "watchfiles>=0.22.0", # file watcher (optional in Phase 0, used Phase 2+)
     # Structured logging
     "structlog>=24.2.0",
 ]
