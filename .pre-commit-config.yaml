@@ -32,6 +32,7 @@ repos:
       - id: mypy
         additional_dependencies:
           - pydantic>=2.7.0
+          - pydantic-settings>=2.3.0
           - types-toml
         files: ^src/sutra/
         args: [--config-file=pyproject.toml]
