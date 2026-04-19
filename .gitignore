@@ -220,7 +220,6 @@ __marimo__/
 
 # uv
 .venv/
-uv.lock
 
 # Local model cache (if present in repo for some reason)
 models/
