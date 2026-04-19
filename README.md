@@ -50,14 +50,28 @@ Claude Code queries all of it via MCP. Obsidian gives you a comfortable text vie
 
 ## Installation
 
-Coming in Phase 0. Not yet available.
+Phase 0 HEAD-only install. A tagged release will follow once the first Phase 0 slice stabilises.
 
 ```bash
-brew tap sutra-ai/tap
-brew install sutra
-sutra init
-sutra register ~/Work/your-project --scope work
+brew tap singhavishek/sutra
+brew install --HEAD sutra
 ```
+
+The formula installs the `sutra` CLI plus `redis` (sutra invokes `redis-server` to supervise FalkorDB). The FalkorDB Redis module (`falkordb.so`) is not in homebrew-core; install it via the FalkorDB tap:
+
+```bash
+brew tap falkordb/falkordb
+brew install falkordb
+```
+
+Then initialise sutra on the machine:
+
+```bash
+sutra init                                   # create dirs, load launchd plist, register MCP
+sutra register ~/Work/your-project --scope work   # Phase 0 deliverable #2 (not yet shipped)
+```
+
+Tap source: [singhavishek/homebrew-sutra](https://github.com/singhavishek/homebrew-sutra).
 
 ## Development
 
