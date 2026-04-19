@@ -45,7 +45,6 @@ def test_init_runs_end_to_end_and_reports_success(
     monkeypatch.setenv("SUTRA_PATHS__LOG_HOME", str(tmp_path / "logs"))
     monkeypatch.setenv("SUTRA_PATHS__LAUNCH_AGENTS_DIR", str(tmp_path / "launchagents"))
     monkeypatch.setenv("SUTRA_PATHS__CLAUDE_MCP_CONFIG_PATH", str(tmp_path / ".claude.json"))
-    monkeypatch.setenv("SUTRA_CONFIG_TOML", str(tmp_path / "missing.toml"))
 
     result = runner.invoke(app, ["init"])
 

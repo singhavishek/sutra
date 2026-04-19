@@ -1,14 +1,4 @@
-"""Sutra runtime settings: paths, network, and future model/secrets sections.
-
-Single source of truth. Composition: `SutraSettings` is the root `BaseSettings`,
-holding nested `BaseModel` sub-models (`paths`, `network`). Defaults live here
-as code; users override via env vars (`SUTRA_PATHS__CONFIG_HOME`, etc.) or via
-an optional TOML file at `~/.sutra/config.toml`.
-
-Source precedence (highest wins): constructor kwargs > env vars > TOML > coded
-defaults. Secrets must come from env (the TOML file is treated as user-readable
-and is never written by sutra except as `config.example.toml`).
-"""
+"""Sutra runtime settings. Source precedence: init > env (SUTRA_*__*) > TOML > defaults."""
 
 from __future__ import annotations
 
@@ -146,11 +136,7 @@ class PathsSettings(BaseModel):
 
 
 class NetworkSettings(BaseModel):
-    """TCP ports and network-facing endpoints for sutra services.
-
-    Defaults are chosen to avoid common dev-tool collisions (Redis 6379,
-    Neo4j 7687, AirPlay 5000/7000, Postgres 5432, Mongo 27017, etc.).
-    """
+    """TCP ports for sutra services."""
 
     falkordb_port: int = Field(
         default=16379,
@@ -163,13 +149,7 @@ class NetworkSettings(BaseModel):
 
 
 class FalkorDBSettings(BaseModel):
-    """Discovery hints for the FalkorDB Redis module and host binary.
-
-    All fields are optional. Leave at `None` to fall back to PATH lookup
-    (`redis-server`) and standard install locations (Homebrew, /usr/local).
-    Override via `SUTRA_FALKORDB__*` env vars when sutra is installed in a
-    non-standard layout.
-    """
+    """Discovery hints for the FalkorDB Redis module and host binary."""
 
     redis_server_binary: Path | None = Field(
         default=None,

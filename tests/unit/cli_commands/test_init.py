@@ -27,7 +27,6 @@ def _settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> SutraSettings:
     monkeypatch.setenv("SUTRA_PATHS__LOG_HOME", str(tmp_path / "logs"))
     monkeypatch.setenv("SUTRA_PATHS__LAUNCH_AGENTS_DIR", str(tmp_path / "launchagents"))
     monkeypatch.setenv("SUTRA_PATHS__CLAUDE_MCP_CONFIG_PATH", str(tmp_path / ".claude.json"))
-    monkeypatch.setenv("SUTRA_CONFIG_TOML", str(tmp_path / "missing.toml"))
     monkeypatch.delenv("SUTRA_PATHS__LAUNCHD_LABEL", raising=False)
     return SutraSettings()
 
@@ -192,15 +191,18 @@ def test_run_invokes_launchctl_bootstrap_on_darwin(
 ) -> None:
     settings = _settings(tmp_path, monkeypatch)
     monkeypatch.setattr(launchd_module.sys, "platform", "darwin")
-    monkeypatch.setattr(launchd_module, "_is_loaded", lambda _s: False)
+    monkeypatch.setattr(launchd_module.os, "getuid", lambda: 501, raising=False)
 
     calls: list[list[str]] = []
+    # print → 113 ("not loaded"), then bootstrap → 0 (success)
+    queue = [113, 0]
 
     def fake_run(argv: list[str], **_: object) -> object:
+        rc = queue.pop(0) if queue else 0
         calls.append(list(argv))
 
         class _R:
-            returncode = 0
+            returncode = rc
             stdout = b""
             stderr = b""
 
@@ -212,6 +214,5 @@ def test_run_invokes_launchctl_bootstrap_on_darwin(
 
     assert result.launchd_skipped is False
     assert result.launchd_action == "bootstrap"
-    assert calls, "launchctl should have been invoked"
+    assert [c[1] for c in calls] == ["print", "bootstrap"]
     assert calls[-1][0] == "/bin/launchctl"
-    assert "bootstrap" in calls[-1]

@@ -18,8 +18,6 @@ if TYPE_CHECKING:
     from sutra.core.settings import SutraSettings
 
 DEFAULT_SUTRA_BINARY = Path("/opt/homebrew/bin/sutra")
-_FALKORDB_LOG_FILENAME = "falkordb.log"
-_FALKORDB_ERR_LOG_FILENAME = "falkordb.err.log"
 _PLIST_MODE = 0o600
 _LAUNCHCTL = "/bin/launchctl"
 
@@ -48,8 +46,8 @@ def render_plist(settings: SutraSettings, *, sutra_binary: Path = DEFAULT_SUTRA_
         "KeepAlive": {"Crashed": True, "SuccessfulExit": False},
         "ThrottleInterval": 10,
         "WatchPaths": [str(paths.projects_yaml), str(paths.config_toml)],
-        "StandardOutPath": str(paths.log_home / _FALKORDB_LOG_FILENAME),
-        "StandardErrorPath": str(paths.log_home / _FALKORDB_ERR_LOG_FILENAME),
+        "StandardOutPath": str(paths.log_home / "falkordb.log"),
+        "StandardErrorPath": str(paths.log_home / "falkordb.err.log"),
     }
     return plistlib.dumps(payload)
 

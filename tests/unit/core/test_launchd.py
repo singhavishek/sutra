@@ -18,7 +18,6 @@ def _settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> SutraSettings:
     monkeypatch.setenv("SUTRA_PATHS__DATA_HOME", str(tmp_path / "data"))
     monkeypatch.setenv("SUTRA_PATHS__LOG_HOME", str(tmp_path / "logs"))
     monkeypatch.setenv("SUTRA_PATHS__LAUNCH_AGENTS_DIR", str(tmp_path / "launchagents"))
-    monkeypatch.setenv("SUTRA_CONFIG_TOML", str(tmp_path / "missing.toml"))
     monkeypatch.delenv("SUTRA_PATHS__LAUNCHD_LABEL", raising=False)
     return SutraSettings()
 
@@ -43,7 +42,6 @@ def test_render_plist_label_follows_settings(
 ) -> None:
     monkeypatch.setenv("SUTRA_PATHS__LAUNCH_AGENTS_DIR", str(tmp_path))
     monkeypatch.setenv("SUTRA_PATHS__LAUNCHD_LABEL", "com.example.custom")
-    monkeypatch.setenv("SUTRA_CONFIG_TOML", str(tmp_path / "missing.toml"))
     settings = SutraSettings()
     data = plistlib.loads(render_plist(settings))
     assert data["Label"] == "com.example.custom"
